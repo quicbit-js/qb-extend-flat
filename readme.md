@@ -1,10 +1,10 @@
 # qb-extend-flat
 
-    [![npm][npm-image]][npm-url]
-    [![downloads][downloads-image]][npm-url]
-    [![dependencies][proddep-image]][proddep-link]
-    [![dev dependencies][devdep-image]][devdep-link]
-    [![code analysis][code-image]][code-link]
+[![npm][npm-image]][npm-url]
+[![downloads][downloads-image]][npm-url]
+[![dependencies][proddep-image]][proddep-link]
+[![dev dependencies][devdep-image]][devdep-link]
+[![code analysis][code-image]][code-link]
 
 
 [npm-image]:       https://img.shields.io/npm/v/qb-extend-flat.svg

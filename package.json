@@ -1,6 +1,6 @@
 {
   "name": "qb-extend-flat",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A tiny function that takes a brutally flat approach to prototype inheritance - a bit like Object.assign() for prototypes.",
   "homepage": "https://github.com/quicbit-js/qb-extend-flat",
   "url": "https://github.com/quicbit-js/qb-extend-flat/issues",

@@ -91,7 +91,7 @@ ES5.  The code can be *almost* as concise and simple as ES6 classes.  These exam
 included in the project on github.
 
 
-### ES6
+### Using class (ES6 Only)
 
 To show the similarity with qb-extend-flat examples (below), here is an ES6 class example:
 
@@ -134,10 +134,10 @@ Create and use a circle:
     > circle, radius 10 at [3, 2]
 
 
-### ES5 with extend
+### qb-extend-flat (ES5 compatible)
 
 Note that when we apply extend(), **it makes working constructor functions out of the constructor
-properties** (Shape.constructor.prototype = Shape and
+properties** (setting Shape.constructor.prototype = Shape and
 Circle.constructor.prototype = Circle).  This allows 
 class specifications more similar to those in ES6.  
 
@@ -180,7 +180,7 @@ Create and use a circle:
     circle.draw()
     > circle, radius 10 at [3, 2]
 
-### ES5 with extend and stand-alone constructors
+### qb-extend-flat with and stand-alone constructors (ES5 compatible)
 
 We can also apply extend to old-school js constructor functions like so: 
 

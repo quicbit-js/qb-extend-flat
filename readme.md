@@ -92,6 +92,9 @@ included in the project on github.
 
 
 ### ES6
+
+To show the similarity with qb-extend-flat examples (below), here is an ES6 class example:
+
 ```js
     class Shape {
         constructor (x, y) {

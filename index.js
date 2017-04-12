@@ -1,6 +1,12 @@
-module.exports = function (proto, extension, ignore) {
-  var enames = Object.getOwnPropertyNames(extension).concat(ignore || [])
-  var pnames = Object.getOwnPropertyNames(proto).filter(function (p) { return !~enames.indexOf(p) })
-  pnames.forEach(function (p) { Object.defineProperty(extension, p, Object.getOwnPropertyDescriptor(proto, p)) })
-  return extension
+module.exports = function (proto, obj, ignore) {
+  var pproto = null
+  if (proto) {
+    pproto = Object.getPrototypeOf(proto)
+    var onames = Object.getOwnPropertyNames(obj).concat(ignore || [])
+    var pnames = Object.getOwnPropertyNames(proto).filter(function (p) { return !~onames.indexOf(p) })
+    if (~onames.indexOf('constructor')) { obj.constructor.prototype = obj }
+    pnames.forEach(function (p) { Object.defineProperty(obj, p, Object.getOwnPropertyDescriptor(proto, p)) })
+  }
+  Object.setPrototypeOf(obj, pproto)
+  return obj
 }

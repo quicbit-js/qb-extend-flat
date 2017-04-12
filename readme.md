@@ -23,7 +23,38 @@ inheritance.
 If you want to  inherit the properties (functions, accessors, etc) from one prototype into 
 another, but have made the decision to avoid prototype chains, then
 qb-extend-flat could be your friend.  It efficiently 
-pancakes missing properties from one object onto another.
+pancakes missing properties from one object onto another to create an object with a one-level prototype.
+
+Traditional prototype chain for a circle object (ES6)
+
+    class Shape { ... shape definition }
+    class Circle extends Shape { ... circle definition ... }
+
+    circle
+       |___ Circle
+              |___ Shape
+                     |___ Object
+                      
+                      
+extend-flat (ES5+)
+
+    Shape =  extend( {},    { ... shape definition  ... } )
+    Circle = extend( Shape, { ... circle definition ... } )
+
+    circle
+       |___ Circle (with Shape properties)
+              |___ Object
+              
+
+or extend-flat (ES5+) with null prototype...
+
+    Shape =  extend( null,  { ... shape definition  ... } )
+    Circle = extend( Shape, { ... circle definition ... } )
+
+    circle
+       |___ Circle (with Shape properties)
+    
+
 
 **Complies with the 100% test coverage and minimum dependency requirements** of 
 [qb-standard](http://github.com/quicbit-js/qb-standard) . 
@@ -36,7 +67,8 @@ pancakes missing properties from one object onto another.
 
     var extend = require('qb-extend-flat')
     
-    var childProto = extend( parentProto, {
+    var Child = extend( parentProto, {
+        constructor: function Child() {...}
         aFunction: function () {...},
         get anAccessor() {...},
         set aMutator() {...},
@@ -50,10 +82,16 @@ are calling up the prototype chain using Object.getPrototypeOf(), super(), and t
 this may not be the function for you - unless you want to flatten your classes out and start migrating
 towards functional.  
 
-qb-extend-flat along with a handful of conventions can work well for light-weight static OOP needs in 
-ES5.  The code can be *almost* as concise and simple as ES6 code:
+Take note that qb-extend-flat does *not* copy Symbols.
 
-ES6
+## Examples
+
+qb-extend-flat along with a handful of conventions can work well for light-weight static OOP needs in 
+ES5.  The code can be *almost* as concise and simple as ES6 classes.  These examples are also
+included in the project on github.
+
+
+### ES6
 ```js
     class Shape {
         constructor (x, y) {
@@ -78,7 +116,7 @@ ES6
             this.radius = radius
         }
         draw (context) {
-            //...
+            console.log('draw circle, radius ' + this .radius + ' at [' + this.x + ', ' + this.y + ']' )
         }
         rotate (context, degrees) {
             // nothing to do for circle
@@ -86,47 +124,116 @@ ES6
     }
 ```
 
-ES5 with extend:
+Create and use a circle:
+
+    let circle = new Circle(3, 2, 10)
+    circle.draw()
+    > circle, radius 10 at [3, 2]
+
+
+### ES5 with extend
+
+Note that when we apply extend(), **it makes working constructor functions out of the constructor
+properties** (Shape.constructor.prototype = Shape and
+Circle.constructor.prototype = Circle).  This allows 
+class specifications more similar to those in ES6.  
+
 ```js
-    function Shape (x, y) {
+var extend = require('qb-extend-flat')
+
+var Shape = extend({}, {
+    constructor: function Shape(x, y) {
         this.x = x
         this.y = y
+    },
+    moveTo: function (x, y) {
+        this.x = x
+        this.y = y
+    },
+    move: function (x, y) {
+        this.x += x
+        this.y += y
     }
-    Shape.prototype = {
-        constructor: Shape,
-        moveTo (x, y) {
-            this.x = x
-            this.y = y
-        },
-        move (x, y) {
-            this.x += x
-            this.y += y
-        }
-        // more methods...
-    }
-    
-    function Circle (x, y, radius) {
-        Shape.call(this, x, y)
-        this.radius = radius
-    }
-    Circle.prototype = extend(Shape.prototype, {
-        draw: function (context) {
-            //...
-        },
-        rotate: function (context, degrees) {
-            // nothing to do for circle
-        },
-    })
-```
+    // more methods...
+})
 
-The resulting instantiated object can simpler to understand since it's just one prototype level
-deep.  It can help with debugging.  
+var Circle = extend(Shape, {
+    constructor: function Circle (x, y, radius) {
+        Shape.constructor.call(this, x, y)
+        this.radius = radius
+    },
+    draw: function (context) {
+        console.log('draw circle, radius ' + this .radius + ' at [' + this.x + ', ' + this.y + ']' )
+    },
+    rotate: function (context, degrees) {
+        // nothing to do for circle
+    },
+})
+
+```
+Create and use a circle:
+
+    var circle = new Circle.constructor(3, 2, 10)
+    circle.draw()
+    > circle, radius 10 at [3, 2]
+
+### ES5 with extend and stand-alone constructors
+
+We can also apply extend to old-school js constructor functions like so: 
+
+```js
+var extend = requre('qb-extend-flat')
+
+function Shape (x, y) {
+    this.x = x
+    this.y = y
+}
+Shape.prototype = {
+    constructor: Shape,
+    moveTo (x, y) {
+        this.x = x
+        this.y = y
+    },
+    move (x, y) {
+        this.x += x
+        this.y += y
+    }
+    // more methods...
+}
+
+function Circle (x, y, radius) {
+    Shape.call(this, x, y)
+    this.radius = radius
+}
+Circle.prototype = extend(Shape.prototype, {
+    draw: function (out) {
+        out('circle, radius ' + this .radius + ' at [' + this.x + ', ' + this.y + ']' )
+    },
+    rotate: function (context, degrees) {
+        // nothing to do for circle
+    },
+})
+
+```
+    
+Create and draw circle:
+
+    var circle = new Circle(3, 2, 10)
+    circle.draw(console.log)
+    > circle, radius 10 at [3, 2]
+   
+
+## Impact of applying qb-extend-flat
+
+The flat instances created with extend can be simpler to understand since they are 
+just one prototype level
+deep - which can help with debugging.  
 
 If you have deep class hierarchies, using qb-extend-flat may help with performance 
 as well, though we havent tested this across different engines.  
 If you use flat extension and it does help performance, we would love to hear about it.
 
-\* Note that qb-extend-flat does not copy Symbols.
+Take note that qb-extend-flat does *not* copy Symbols.
 
 # This doesn't work for OOP!  What about object types and instanceof?  What about super()?
 
